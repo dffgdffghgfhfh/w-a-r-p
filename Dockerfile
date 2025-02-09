@@ -19,42 +19,34 @@ RUN echo "TARGETPLATFORM is: ${TARGETPLATFORM}"
 COPY entrypoint.sh /entrypoint.sh
 COPY ./healthcheck /healthcheck
 
+# 确保 GOST_VERSION 不为空，若为空则设置为默认版本
+ARG GOST_VERSION=2.12.1  # 可以修改为所需的默认版本
+ENV GOST_VERSION=${GOST_VERSION}
+
 # 安装 curl 工具
 RUN apt-get update && \
     apt-get install -y curl
 
-# 继续原来的构建步骤
-RUN echo "GOST_VERSION is: ${GOST_VERSION}" && \
-    echo "TARGETPLATFORM is: ${TARGETPLATFORM}" && \
-    echo "Before setting ARCH: ${ARCH}" && \
-    case ${TARGETPLATFORM} in \
-      "linux/amd64") export ARCH="amd64" ;; \
-      "linux/arm64") export ARCH="arm64" ;; \
-      "linux/arm/v7") export ARCH="armv7" ;; \
-      *) export ARCH="unknown" ;; \
-    esac && \
-    echo "After setting ARCH: ${ARCH}" && \
-    if [ -z "${ARCH}" ]; then \
-      echo "Error: ARCH is not set correctly!" && \
-      exit 1; \
+# 确保下载链接正确
+RUN if [ -z "${GOST_VERSION}" ]; then \
+        echo "Error: GOST_VERSION is not set!" && exit 1; \
     fi && \
-    echo "Building for ${TARGETPLATFORM} with GOST ${GOST_VERSION}" && \
     MAJOR_VERSION=$(echo ${GOST_VERSION} | cut -d. -f1) && \
     MINOR_VERSION=$(echo ${GOST_VERSION} | cut -d. -f2) && \
     if [ "${MAJOR_VERSION}" -ge 3 ] || [ "${MAJOR_VERSION}" -eq 2 -a "${MINOR_VERSION}" -ge 12 ]; then \
-      NAME_SYNTAX="new" && \
-      FILE_NAME="gost_${GOST_VERSION}_linux_${ARCH}.tar.gz"; \
+        NAME_SYNTAX="new" && \
+        FILE_NAME="gost_${GOST_VERSION}_linux_${ARCH}.tar.gz"; \
     else \
-      NAME_SYNTAX="legacy" && \
-      FILE_NAME="gost-linux-${ARCH}-${GOST_VERSION}.gz"; \
+        NAME_SYNTAX="legacy" && \
+        FILE_NAME="gost-linux-${ARCH}-${GOST_VERSION}.gz"; \
     fi && \
     echo "File name: ${FILE_NAME}" && \
     curl -LO https://github.com/ginuerzh/gost/releases/download/v${GOST_VERSION}/${FILE_NAME} && \
     if [ "${NAME_SYNTAX}" = "new" ]; then \
-      tar -xzf ${FILE_NAME} -C /usr/bin/ gost; \
+        tar -xzf ${FILE_NAME} -C /usr/bin/ gost; \
     else \
-      gunzip ${FILE_NAME} && \
-      mv gost-linux-${ARCH}-${GOST_VERSION} /usr/bin/gost; \
+        gunzip ${FILE_NAME} && \
+        mv gost-linux-${ARCH}-${GOST_VERSION} /usr/bin/gost; \
     fi && \
     chmod +x /usr/bin/gost && \
     chmod +x /entrypoint.sh && \
