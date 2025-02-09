@@ -19,7 +19,11 @@ RUN echo "TARGETPLATFORM is: ${TARGETPLATFORM}"
 COPY entrypoint.sh /entrypoint.sh
 COPY ./healthcheck /healthcheck
 
-# 增加更多调试信息，确保 ARCH 变量正确赋值
+# 安装 curl 工具
+RUN apt-get update && \
+    apt-get install -y curl
+
+# 继续原来的构建步骤
 RUN echo "GOST_VERSION is: ${GOST_VERSION}" && \
     echo "TARGETPLATFORM is: ${TARGETPLATFORM}" && \
     echo "Before setting ARCH: ${ARCH}" && \
