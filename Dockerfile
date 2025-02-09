@@ -62,7 +62,6 @@ RUN echo "GOST_VERSION is: ${GOST_VERSION}" && \  # 添加调试输出，确保 
     chmod +x /healthcheck/index.sh && \
     useradd -m -s /bin/bash warp && \
     echo "warp ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/warp
-
 USER warp
 
 # Accept Cloudflare WARP TOS
