@@ -1,4 +1,6 @@
 FROM ubuntu:22.04
+# 设置默认平台为 linux/amd64
+ARG TARGETPLATFORM=linux/amd64
 
 ARG WARP_VERSION
 ARG GOST_VERSION
@@ -10,6 +12,9 @@ LABEL org.opencontainers.image.url="https://github.com/cmj2002/warp-docker"
 LABEL WARP_VERSION=${WARP_VERSION}
 LABEL GOST_VERSION=${GOST_VERSION}
 LABEL COMMIT_SHA=${COMMIT_SHA}
+
+# 调试：输出 TARGETPLATFORM 的值
+RUN echo "TARGETPLATFORM is: ${TARGETPLATFORM}"
 
 COPY entrypoint.sh /entrypoint.sh
 COPY ./healthcheck /healthcheck
