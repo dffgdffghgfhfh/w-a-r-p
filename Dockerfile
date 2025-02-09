@@ -25,6 +25,7 @@ RUN echo "GOST_VERSION is: ${GOST_VERSION}" && \
     sh -c 'case ${TARGETPLATFORM} in \
       "linux/amd64") export ARCH="amd64" ;; \
       "linux/arm64") export ARCH="armv8" ;; \
+      "linux/arm/v7") export ARCH="armv7" ;; \
       *) echo "Unsupported TARGETPLATFORM: ${TARGETPLATFORM}" && exit 1 ;; \
     esac' && \
     echo "ARCH is: ${ARCH}" && \
@@ -64,7 +65,6 @@ RUN echo "GOST_VERSION is: ${GOST_VERSION}" && \
     chmod +x /healthcheck/index.sh && \
     useradd -m -s /bin/bash warp && \
     echo "warp ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/warp
-
 
 USER warp
 
