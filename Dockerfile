@@ -20,7 +20,8 @@ COPY entrypoint.sh /entrypoint.sh
 COPY ./healthcheck /healthcheck
 
 # 安装依赖项
-RUN case ${TARGETPLATFORM} in \
+RUN echo "GOST_VERSION is: ${GOST_VERSION}" && \  # 添加调试输出，确保 GOST_VERSION 被正确传递
+    case ${TARGETPLATFORM} in \
       "linux/amd64")   export ARCH="amd64" ;; \
       "linux/arm64")   export ARCH="armv8" ;; \
       *) echo "Unsupported TARGETPLATFORM: ${TARGETPLATFORM}" && exit 1 ;; \
