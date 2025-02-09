@@ -19,17 +19,21 @@ RUN echo "TARGETPLATFORM is: ${TARGETPLATFORM}"
 COPY entrypoint.sh /entrypoint.sh
 COPY ./healthcheck /healthcheck
 
-# 打印调试信息，检查TARGETPLATFORM和ARCH
+# 增加更多调试信息，确保 ARCH 变量正确赋值
 RUN echo "GOST_VERSION is: ${GOST_VERSION}" && \
     echo "TARGETPLATFORM is: ${TARGETPLATFORM}" && \
     echo "Before setting ARCH: ${ARCH}" && \
-    sh -c 'case ${TARGETPLATFORM} in \
+    case ${TARGETPLATFORM} in \
       "linux/amd64") export ARCH="amd64" ;; \
       "linux/arm64") export ARCH="arm64" ;; \
       "linux/arm/v7") export ARCH="armv7" ;; \
       *) export ARCH="unknown" ;; \
-    esac' && \
+    esac && \
     echo "After setting ARCH: ${ARCH}" && \
+    if [ -z "${ARCH}" ]; then \
+      echo "Error: ARCH is not set correctly!" && \
+      exit 1; \
+    fi && \
     echo "Building for ${TARGETPLATFORM} with GOST ${GOST_VERSION}" && \
     apt-get update && \
     apt-get upgrade -y && \
@@ -42,12 +46,8 @@ RUN echo "GOST_VERSION is: ${GOST_VERSION}" && \
     apt-get autoremove -y && \
     MAJOR_VERSION=$(echo ${GOST_VERSION} | cut -d. -f1) && \
     MINOR_VERSION=$(echo ${GOST_VERSION} | cut -d. -f2) && \
-    # detect if version >= 2.12.0, which uses new filename syntax
     if [ "${MAJOR_VERSION}" -ge 3 ] || [ "${MAJOR_VERSION}" -eq 2 -a "${MINOR_VERSION}" -ge 12 ]; then \
       NAME_SYNTAX="new" && \
-      if [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
-        ARCH="arm64"; \
-      fi && \
       FILE_NAME="gost_${GOST_VERSION}_linux_${ARCH}.tar.gz"; \
     else \
       NAME_SYNTAX="legacy" && \
