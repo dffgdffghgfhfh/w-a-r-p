@@ -18,15 +18,14 @@ RUN echo "TARGETPLATFORM is: ${TARGETPLATFORM}"
 
 COPY entrypoint.sh /entrypoint.sh
 COPY ./healthcheck /healthcheck
-
 # 安装依赖项
-RUN echo "GOST_VERSION is: ${GOST_VERSION}" && \  # 添加调试输出，确保 GOST_VERSION 被正确传递
-    case ${TARGETPLATFORM} in \
-      "linux/amd64")   export ARCH="amd64" ;; \
-      "linux/arm64")   export ARCH="armv8" ;; \
+RUN echo "GOST_VERSION is: ${GOST_VERSION}" && \
+    sh -c 'case ${TARGETPLATFORM} in \
+      "linux/amd64") export ARCH="amd64" ;; \
+      "linux/arm64") export ARCH="armv8" ;; \
       *) echo "Unsupported TARGETPLATFORM: ${TARGETPLATFORM}" && exit 1 ;; \
-    esac && \
-    echo "Building for ${TARGETPLATFORM} with GOST ${GOST_VERSION}" &&\
+    esac' && \
+    echo "Building for ${TARGETPLATFORM} with GOST ${GOST_VERSION}" && \
     apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y curl gnupg lsb-release sudo jq ipcalc && \
@@ -62,6 +61,7 @@ RUN echo "GOST_VERSION is: ${GOST_VERSION}" && \  # 添加调试输出，确保 
     chmod +x /healthcheck/index.sh && \
     useradd -m -s /bin/bash warp && \
     echo "warp ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/warp
+
 USER warp
 
 # Accept Cloudflare WARP TOS
