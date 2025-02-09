@@ -19,7 +19,7 @@ RUN echo "TARGETPLATFORM is: ${TARGETPLATFORM}"
 COPY entrypoint.sh /entrypoint.sh
 COPY ./healthcheck /healthcheck
 
-# install dependencies
+# 安装依赖项
 RUN case ${TARGETPLATFORM} in \
       "linux/amd64")   export ARCH="amd64" ;; \
       "linux/arm64")   export ARCH="armv8" ;; \
