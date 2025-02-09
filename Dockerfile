@@ -18,13 +18,16 @@ RUN echo "TARGETPLATFORM is: ${TARGETPLATFORM}"
 
 COPY entrypoint.sh /entrypoint.sh
 COPY ./healthcheck /healthcheck
+
 # 安装依赖项
 RUN echo "GOST_VERSION is: ${GOST_VERSION}" && \
+    echo "TARGETPLATFORM is: ${TARGETPLATFORM}" && \
     sh -c 'case ${TARGETPLATFORM} in \
       "linux/amd64") export ARCH="amd64" ;; \
       "linux/arm64") export ARCH="armv8" ;; \
       *) echo "Unsupported TARGETPLATFORM: ${TARGETPLATFORM}" && exit 1 ;; \
     esac' && \
+    echo "ARCH is: ${ARCH}" && \
     echo "Building for ${TARGETPLATFORM} with GOST ${GOST_VERSION}" && \
     apt-get update && \
     apt-get upgrade -y && \
@@ -61,6 +64,7 @@ RUN echo "GOST_VERSION is: ${GOST_VERSION}" && \
     chmod +x /healthcheck/index.sh && \
     useradd -m -s /bin/bash warp && \
     echo "warp ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/warp
+
 
 USER warp
 
