@@ -19,16 +19,17 @@ RUN echo "TARGETPLATFORM is: ${TARGETPLATFORM}"
 COPY entrypoint.sh /entrypoint.sh
 COPY ./healthcheck /healthcheck
 
-# 确保ARCH变量正确设置
+# 打印调试信息，检查TARGETPLATFORM和ARCH
 RUN echo "GOST_VERSION is: ${GOST_VERSION}" && \
     echo "TARGETPLATFORM is: ${TARGETPLATFORM}" && \
+    echo "Before setting ARCH: ${ARCH}" && \
     sh -c 'case ${TARGETPLATFORM} in \
       "linux/amd64") export ARCH="amd64" ;; \
       "linux/arm64") export ARCH="arm64" ;; \
       "linux/arm/v7") export ARCH="armv7" ;; \
       *) export ARCH="unknown" ;; \
     esac' && \
-    echo "ARCH is: ${ARCH}" && \
+    echo "After setting ARCH: ${ARCH}" && \
     echo "Building for ${TARGETPLATFORM} with GOST ${GOST_VERSION}" && \
     apt-get update && \
     apt-get upgrade -y && \
