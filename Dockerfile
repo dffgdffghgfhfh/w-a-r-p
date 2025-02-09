@@ -35,15 +35,6 @@ RUN echo "GOST_VERSION is: ${GOST_VERSION}" && \
       exit 1; \
     fi && \
     echo "Building for ${TARGETPLATFORM} with GOST ${GOST_VERSION}" && \
-    apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install -y curl gnupg lsb-release sudo jq ipcalc && \
-    curl https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg && \
-    echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/cloudflare-client.list && \
-    apt-get update && \
-    apt-get install -y cloudflare-warp && \
-    apt-get clean && \
-    apt-get autoremove -y && \
     MAJOR_VERSION=$(echo ${GOST_VERSION} | cut -d. -f1) && \
     MINOR_VERSION=$(echo ${GOST_VERSION} | cut -d. -f2) && \
     if [ "${MAJOR_VERSION}" -ge 3 ] || [ "${MAJOR_VERSION}" -eq 2 -a "${MINOR_VERSION}" -ge 12 ]; then \
